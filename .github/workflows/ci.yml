@@ -50,8 +50,15 @@ jobs:
       - name: Setup (ptau + circuit + zkey, pins verified)
         run: npm run setup
 
-      - name: Unit + integration + negative + determinism (vitest)
-        run: npx vitest run
+      # The protocol / kyber / ledger_verifier / bench_env suites exercise the
+      # Windows+WSL2 host (the PQC bridge calls wsl.exe and the §B bench guard
+      # calls powershell) and are validated there; they cannot run on a native
+      # Linux runner. On Linux we run the platform-agnostic circuit + determinism
+      # suites against the committed, SHA-256-pinned circuit build, zkey, and
+      # ptau. The dilithium-py<->liboqs interop and the negative test (below) are
+      # also platform-agnostic and run here.
+      - name: Cross-platform circuit + determinism suites (vitest)
+        run: npx vitest run tests/circuit.test.ts tests/determinism.test.ts
 
       - name: Interop (dilithium-py <-> liboqs)
         run: |
