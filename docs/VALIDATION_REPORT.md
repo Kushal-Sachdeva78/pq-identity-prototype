@@ -21,6 +21,18 @@ the paper's evaluation.
 > paper and the prototype report the same numbers. The documentation
 > discrepancies B1–B3 (REPRODUCE.md zkey hash, `verify-pins` script,
 > `vc-schema.json` comment) are fixed. See [`MISSING_ARTIFACTS.md`](MISSING_ARTIFACTS.md).
+>
+> **CI is green.** GitHub Actions (`.github/workflows/ci.yml`) runs on every push
+> to `main`. On a clean `ubuntu-24.04` runner it builds the native toolchain
+> (liboqs/GMP/rapidsnark/venv), runs `npm ci` and `npm run setup` (**ptau + zkey
+> pins verified**), and passes lint + typecheck, the cross-platform **circuit +
+> determinism** vitest suites, the **dilithium-py↔liboqs interop**, and the
+> **revoked-credential negative test**. The Linux `test` job is scoped to those
+> platform-agnostic suites because the `protocol`/`kyber`/`ledger_verifier`/
+> `bench_env` suites and the timed benches exercise the Windows+WSL2 host (PQC
+> bridge via `wsl.exe`; §B guard via `powershell`) and are validated there. The
+> green run is itself a fresh-checkout clean-environment validation of the
+> published commit.
 
 ---
 
@@ -144,6 +156,9 @@ No risk in this table blocks reproduction of a measured claim.
 > - **Documentation fixes** — the corrected zkey hash in `REPRODUCE.md`, the added
 >   `verify-pins` script in `package.json`, and the refreshed `encoding` comment
 >   in `fixtures/vc-schema.json`.
+> - **CI scope** — `.github/workflows/ci.yml`'s Linux `test` job was scoped to the
+>   platform-agnostic suites (it cannot run the Windows/WSL-only suites on Linux).
+>   No test's logic was changed — only which suites the Linux runner executes.
 >
 > No logic, algorithm, cryptographic operation, circuit, smart contract,
 > benchmark computation, **measured value**, test, or measured `results/*.json`
