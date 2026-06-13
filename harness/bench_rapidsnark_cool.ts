@@ -95,14 +95,14 @@ async function main(): Promise<void> {
     campaignComparison: {
       note: "compare against results/zk.json rapidsnarkProveCold/Amortized (heat-soaked ordering)",
     },
-    paperClaim: { coldMeanMs: 156.28, coldMedianMs: 153.51 },
+    paperClaim: { manuscriptVersion: "V6.6", coolMs: 177 },
   };
   fs.mkdirSync(RESULTS_DIR, { recursive: true });
   const outFile = path.join(RESULTS_DIR, "zk_rapidsnark_cool.json");
   fs.writeFileSync(outFile, JSON.stringify(result, null, 2));
   console.log(
     `[rapidsnark-cool] cold ${result.cold.headline.valueMs} ms (runs ${result.cold.interRun.mediansMs.join("/")}, CV ${result.cold.interRun.cvPct}%); ` +
-      `amortized ${result.amortized.headline.valueMs} ms (CV ${result.amortized.interRun.cvPct}%) (paper 156.28) -> ${outFile}`
+      `amortized ${result.amortized.headline.valueMs} ms (CV ${result.amortized.interRun.cvPct}%) (V6.6 cool 177) -> ${outFile}`
   );
   process.exit(0);
 }

@@ -43,8 +43,9 @@
     }
   },
   "paperClaim": {
-    "gas": "~2-3e5",
-    "label": "[A] analytical"
+    "manuscriptVersion": "V6.6",
+    "gas": 242931,
+    "label": "[M] measured (local single-node EVM; public testnet remains [F])"
   },
   "verifyProofDirectTxGasUsed": 242931,
   "probeTxGasUsed": 268893,

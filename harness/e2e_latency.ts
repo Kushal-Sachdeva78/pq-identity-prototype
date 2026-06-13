@@ -83,16 +83,18 @@ function main(): void {
         "the sub-second claim holds ONLY for the native (rapidsnark) prover path; the snarkJS-path total must always carry that qualifier",
     },
     paperClaim: {
-      coreMs: 553,
-      coreBreakdown: "356 witness + 156 rapidsnark + 41 verify (paper §VI-C)",
-      e2eRangeMs: "600–900 [S]",
+      manuscriptVersion: "V6.6",
+      coreCoolMs: 309,
+      coreSustainedMs: 390,
+      coreBreakdown: "92 witness + 177 (cool) / 258.6 (sustained) rapidsnark + 40 verify (V6.6 §VI-C)",
+      e2eRangeMs: "340–510 [S]",
     },
     host: hostMeta(),
   };
   const outFile = path.join(RESULTS_DIR, "e2e_latency.json");
   fs.writeFileSync(outFile, JSON.stringify(result, null, 2));
   console.log(
-    `[latency] core: rapidsnark ${coreRapidsnark} ms (paper 553), snarkJS ${coreSnarkjs} ms; ` +
+    `[latency] core: rapidsnark ${coreRapidsnark} ms (V6.6 390 sustained / 309 cool), snarkJS ${coreSnarkjs} ms; ` +
       `e2e rapidsnark ${result.totals.e2eRapidsnarkMs.min}-${result.totals.e2eRapidsnarkMs.max} ms -> ${outFile}`
   );
 }

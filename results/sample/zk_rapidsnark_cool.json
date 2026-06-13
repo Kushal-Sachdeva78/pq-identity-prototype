@@ -162,7 +162,7 @@
     "note": "compare against results/zk.json rapidsnarkProveCold/Amortized (heat-soaked ordering)"
   },
   "paperClaim": {
-    "coldMeanMs": 156.28,
-    "coldMedianMs": 153.51
+    "manuscriptVersion": "V6.6",
+    "coolMs": 177
   }
 }

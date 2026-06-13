@@ -71,9 +71,11 @@
     "qualifier": "the sub-second claim holds ONLY for the native (rapidsnark) prover path; the snarkJS-path total must always carry that qualifier"
   },
   "paperClaim": {
-    "coreMs": 553,
-    "coreBreakdown": "356 witness + 156 rapidsnark + 41 verify (paper §VI-C)",
-    "e2eRangeMs": "600–900 [S]"
+    "manuscriptVersion": "V6.6",
+    "coreCoolMs": 309,
+    "coreSustainedMs": 390,
+    "coreBreakdown": "92 witness + 177 (cool) / 258.6 (sustained) rapidsnark + 40 verify (V6.6 §VI-C)",
+    "e2eRangeMs": "340–510 [S]"
   },
   "host": {
     "cpuModel": "13th Gen Intel(R) Core(TM) i7-1355U",

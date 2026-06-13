@@ -134,7 +134,7 @@ async function main(): Promise<void> {
         fsBasis: "local Anvil EVM (gas units are execution-deterministic)",
         invocations: 1,
       }),
-      paperClaim: { gas: "~2-3e5", label: "[A] analytical" },
+      paperClaim: { manuscriptVersion: "V6.6", gas: 242931, label: "[M] measured (local single-node EVM; public testnet remains [F])" },
       verifyProofDirectTxGasUsed: Number(directGas),
       probeTxGasUsed: Number(probeGas),
       probeNote:
@@ -158,7 +158,7 @@ async function main(): Promise<void> {
     fs.writeFileSync(outFile, JSON.stringify(result, null, 2));
     console.log(
       `[gas] verifyProof direct estimate: ${directGas} gas; probe tx: ${probeGas} gas ` +
-        `(paper [A]: ~2-3e5) -> ${outFile}`
+        `(V6.6 [M]: 242931 bare / 268893 via contract) -> ${outFile}`
     );
     provider.destroy();
   } finally {

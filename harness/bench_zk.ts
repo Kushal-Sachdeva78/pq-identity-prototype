@@ -228,7 +228,7 @@ async function main(): Promise<void> {
         nPubInputs: circuitInfo["nPubInputs"],
         nPrvInputs: circuitInfo["nPrvInputs"],
         version: "v2 (V6: domain-separated stmtCode + 2 predicates)",
-        paperClaim: { nConstraints: 21434, nWires: 21472, nPubInputs: 5, nPrvInputs: 41 },
+        paperClaim: { manuscriptVersion: "V6.6", nConstraints: 21715, nWires: 21745, nPubInputs: 5, nPrvInputs: 43 },
       },
       zkeySha256: zkeySha,
       witnessSha256: witnessSha,
@@ -274,11 +274,13 @@ async function main(): Promise<void> {
       publicSignals: sjSignals.length,
     },
     paperClaims: {
-      snarkjsProveMs: { mean: 1083, median: 876, stddev: 444, n: 1000 },
-      rapidsnarkProveMs: { mean: 156.28, median: 153.51, stddev: 7.6, n: 100 },
-      witnessMs: { mean: 356, stddev: 186 },
-      verifyMs: { mean: 41, stddev: 3.1 },
-      speedup: 6.9,
+      manuscriptVersion: "V6.6",
+      note: "V6.6 adopted the prototype's controlled measurements; mirrors the measured headline fields above. Proving reported per thermal state (cool single-authentication vs sustained back-to-back).",
+      snarkjsProveMs: { coolMs: 981, sustainedMeanMs: 2095, n: 1000 },
+      rapidsnarkProveMs: { coolMs: 177, sustainedMeanMs: 258.6, n: 100 },
+      witnessMs: 92,
+      verifyMs: 40,
+      speedup: { coolCoolX: 5.5, thermalRangeX: "5.5-8" },
       proofBytes: 723,
       publicSignals: 5,
     },
@@ -290,13 +292,13 @@ async function main(): Promise<void> {
 
   const fmt = (p: PhaseResult): string =>
     `${p.headline.valueMs} ms [${p.headline.basis}] (runs: ${p.interRun.mediansMs.join("/")}, CV ${p.interRun.cvPct}%${p.interRun.stable ? "" : " ⚠UNSTABLE"})`;
-  console.log(`\n[bench:zk] witness            ${fmt(witness)} (paper 356)`);
-  console.log(`[bench:zk] snarkjs cold        ${fmt(sjsCold)} (paper 1083 mean / 876 median)`);
+  console.log(`\n[bench:zk] witness            ${fmt(witness)} (V6.6 92)`);
+  console.log(`[bench:zk] snarkjs cold        ${fmt(sjsCold)} (V6.6 981 cool / 2095 sustained)`);
   console.log(`[bench:zk] snarkjs amortized   ${fmt(sjsAmort)}`);
-  console.log(`[bench:zk] rapidsnark cold     ${fmt(rsCold)} (paper 156.28 mean / 153.51 median)`);
+  console.log(`[bench:zk] rapidsnark cold     ${fmt(rsCold)} (V6.6 177 cool / 258.6 sustained)`);
   console.log(`[bench:zk] rapidsnark amortized ${fmt(rsAmort)}`);
-  console.log(`[bench:zk] verify              ${fmt(verify)} (paper 41)`);
-  console.log(`[bench:zk] speedup cold/cold   ${result.speedups.coldCold}x (paper 6.9x); amort/amort ${result.speedups.amortizedAmortized}x`);
+  console.log(`[bench:zk] verify              ${fmt(verify)} (V6.6 40)`);
+  console.log(`[bench:zk] speedup cold/cold   ${result.speedups.coldCold}x (V6.6 5.5x cool/cool, range 5.5-8x); amort/amort ${result.speedups.amortizedAmortized}x`);
   console.log(`[bench:zk] proof ${sjProofBytes} B snarkjs / ${rsProofBytes} B rapidsnark; -> ${outFile}`);
   process.exit(0);
 }
