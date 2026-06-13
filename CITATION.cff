@@ -1,0 +1,46 @@
+cff-version: 1.2.0
+message: "If you use this software or its measurements, please cite both the software and the accompanying paper."
+title: "PQ-ID: A Privacy-Focused, Post-Quantum-Oriented Digital Identity Prototype"
+abstract: >-
+  Reference prototype accompanying the IEEE Access paper "A Privacy-Focused,
+  Post-Quantum-Oriented Digital Identity System Using Blockchain and
+  Zero-Knowledge Proofs" (Access-2026-15409). It executes the full credential
+  lifecycle on real cryptography — CRYSTALS-Dilithium (ML-DSA-44) and
+  CRYSTALS-Kyber (ML-KEM-512) via liboqs 0.15.0, a 21,715-constraint Groth16
+  (BN254) credential circuit proved with both snarkJS and a native rapidsnark
+  prover on byte-identical inputs, a depth-32 Poseidon sparse-Merkle
+  non-membership revocation accumulator, on-chain Solidity verifier gas
+  measurement on a local EVM, a measured centralized classical baseline, and an
+  end-to-end harness with a revoked-credential negative test.
+type: software
+authors:
+  - given-names: Kushal
+    family-names: Sachdeva
+    orcid: "https://orcid.org/0009-0007-5126-0696"
+    affiliation: "Algorand Foundation (Research Intern); Vasant Valley School, New Delhi, India"
+    email: kushals@vasantvalley.edu.in
+version: "1.0"
+date-released: "2026-06-13"
+license: MIT
+repository-code: "https://github.com/Kushal-Sachdeva78/pq-identity-prototype"
+keywords:
+  - digital identity
+  - post-quantum cryptography
+  - zero-knowledge proofs
+  - Groth16
+  - blockchain
+  - decentralized identifiers
+  - CRYSTALS-Dilithium
+  - CRYSTALS-Kyber
+  - selective disclosure
+  - verifiable credentials
+preferred-citation:
+  type: article
+  title: "A Privacy-Focused, Post-Quantum-Oriented Digital Identity System Using Blockchain and Zero-Knowledge Proofs"
+  authors:
+    - given-names: Kushal
+      family-names: Sachdeva
+      orcid: "https://orcid.org/0009-0007-5126-0696"
+  journal: "IEEE Access"
+  year: 2026
+  notes: "Manuscript ID Access-2026-15409."

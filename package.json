@@ -1,0 +1,56 @@
+{
+  "name": "pqid-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reference prototype for 'A Privacy-Focused, Post-Quantum-Oriented Digital Identity System Using Blockchain and Zero-Knowledge Proofs' (IEEE Access-2026-15409)",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "harness",
+    "cli",
+    "onchain"
+  ],
+  "scripts": {
+    "setup": "tsx setup/download_ptau.ts && tsx setup/build_circuit.ts && tsx setup/groth16_setup.ts",
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "bench:pqc": "tsx harness/bench_pqc.ts",
+    "bench:zk": "tsx harness/bench_zk.ts",
+    "bench:baseline": "tsx packages/baseline/bench_baseline.ts",
+    "gas": "tsx onchain/measure_gas.ts",
+    "e2e": "tsx harness/e2e.ts",
+    "e2e:latency": "tsx harness/e2e_latency.ts",
+    "negative": "tsx harness/negative_test.ts",
+    "probe": "tsx harness/malicious_wallet_probe.ts",
+    "audit": "tsx harness/circomspect_audit.ts",
+    "campaign": "tsx harness/campaign.ts",
+    "tables": "tsx harness/generate_results.ts",
+    "demo": "tsx cli/demo.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.17.0",
+    "@types/node": "22.10.2",
+    "@types/pg": "8.11.10",
+    "eslint": "9.17.0",
+    "prettier": "3.4.2",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2",
+    "typescript-eslint": "8.18.1",
+    "vitest": "2.1.8"
+  },
+  "dependencies": {
+    "bs58": "6.0.0",
+    "circomlib": "2.0.5",
+    "circomlibjs": "0.1.7",
+    "ethers": "6.13.4",
+    "keccak256-circom": "github:vocdoni/keccak256-circom",
+    "pg": "8.13.1",
+    "snarkjs": "0.7.4",
+    "solc": "0.8.28"
+  }
+}

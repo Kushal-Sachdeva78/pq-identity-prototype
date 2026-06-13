@@ -1,0 +1,14 @@
+{
+  "powersOfTau28_hez_final_15.ptau": {
+    "sha256": "3ef2ecc5b75d687048cf2d59195119b42fb07c5af639c5f283d84bfa69829e7f",
+    "source": "https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_15.ptau",
+    "note": "Hermez phase-1 powers of tau, 2^15; established public ceremony [A]"
+  },
+  "credential_auth_final.zkey": {
+    "sha256": "63529c2b8a3320ce352401b3bf89fa0cde4ff3d0c5354e6d5b6f28c83f9101cc",
+    "note": "Deterministic beacon-finalized dev zkey; paper's zkey was 22e69c5b… (different circuit build, see RESULTS.md divergences)"
+  },
+  "verification_key.json": {
+    "sha256": "79d31eb1348bbae607819a1579200030a002b1f877d3151d72e53aeb978a5940"
+  }
+}

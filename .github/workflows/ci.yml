@@ -1,0 +1,62 @@
+name: CI
+
+# Lint + typecheck + the crypto/protocol test suite on a clean Linux runner.
+# The native toolchain (liboqs, rapidsnark) is built once and cached; heavy
+# benchmarks are NOT run in CI (they are measurement, not validation).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.16.0"
+      - run: npm ci
+      - run: npx tsc -p tsconfig.json --noEmit
+      - run: npx eslint .
+
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.16.0"
+
+      - name: Install circom 2.2.3
+        run: |
+          curl -fsSL -o /usr/local/bin/circom \
+            https://github.com/iden3/circom/releases/download/v2.2.3/circom-linux-amd64
+          chmod +x /usr/local/bin/circom
+          circom --version
+
+      - name: Build native toolchain (liboqs + GMP + rapidsnark + venv)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build nasm m4 \
+            python3-venv python3-dev libssl-dev xz-utils
+          PQID_PREFIX="$HOME/pqid-native" bash docker/provision-wsl.sh
+          # The Node paths expect the prover at /root/pqid-native; symlink for CI's $HOME.
+          sudo mkdir -p /root && sudo ln -sfn "$HOME/pqid-native" /root/pqid-native
+
+      - run: npm ci
+
+      - name: Setup (ptau + circuit + zkey, pins verified)
+        run: npm run setup
+
+      - name: Unit + integration + negative + determinism (vitest)
+        run: npx vitest run
+
+      - name: Interop (dilithium-py <-> liboqs)
+        run: |
+          OQS_INSTALL_PATH="$HOME/pqid-native/liboqs-generic" \
+            "$HOME/pqid-native/venv/bin/python" -m pytest tests/interop -q
+
+      - name: Negative test (revoked -> no accepted proof)
+        run: npm run negative

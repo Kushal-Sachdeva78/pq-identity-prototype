@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.ps1 text eol=crlf
+*.ptau binary
+*.zkey binary
+*.wasm binary
+*.r1cs binary
+*.wtns binary
+*.exe binary
