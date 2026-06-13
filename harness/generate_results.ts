@@ -51,67 +51,72 @@ interface ClaimSpec {
   cause: string;
 }
 
+// Paper-claim reference values track the SUBMITTED manuscript (V6.6), which
+// adopted the prototype's controlled measurements. They are compared against
+// the measured results below; with V6.6 the two agree (divergences collapse to
+// ~0 within the 5% threshold). The `measured:` accessors and all comparison
+// logic are unchanged — only these reference constants are versioned to V6.6.
 const CLAIMS: ClaimSpec[] = [
-  // ----- Table IV (paper label [M]; ECDSA reference rows are [A])
-  { id: "dilithium-keygen", table: "IV", metric: "ML-DSA-44 keygen (ms)", paper: 0.124, paperLabel: "[M]", unit: "ms",
+  // ----- Table V (PQC) — V6.6 generic AVX2-off figures
+  { id: "dilithium-keygen", table: "V", metric: "ML-DSA-44 keygen (ms)", paper: 0.052, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-DSA-44"]?.keygen), measuredLabel: "[M]",
-    cause: "OS entropy-source difference: the paper measured on Windows/MinGW where RNG syscalls dominate randomness-consuming ops; Linux getrandom() is much faster. Same liboqs 0.15.0, same AVX2-off generic build." },
-  { id: "dilithium-sign", table: "IV", metric: "ML-DSA-44 sign (ms)", paper: 0.287, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the controlled liboqs 0.15.0 generic (AVX2-off) measurement." },
+  { id: "dilithium-sign", table: "V", metric: "ML-DSA-44 sign (ms)", paper: 0.188, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-DSA-44"]?.sign), measuredLabel: "[M]",
-    cause: "Same entropy-source cause as keygen (hedged signing consumes randomness per rejection-sampling round); verify, which consumes none, matches the paper closely." },
-  { id: "dilithium-verify", table: "IV", metric: "ML-DSA-44 verify (ms)", paper: 0.06, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the controlled measurement." },
+  { id: "dilithium-verify", table: "V", metric: "ML-DSA-44 verify (ms)", paper: 0.058, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-DSA-44"]?.verify), measuredLabel: "[M]",
-    cause: "No randomness consumed — expected to match; small residual is scheduler noise." },
-  { id: "kyber-keygen", table: "IV", metric: "ML-KEM-512 keygen (ms)", paper: 0.091, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the controlled measurement." },
+  { id: "kyber-keygen", table: "V", metric: "ML-KEM-512 keygen (ms)", paper: 0.016, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-KEM-512"]?.keygen), measuredLabel: "[M]",
-    cause: "Large (~4–5×) but explained: ML-KEM keygen is dominated by randomness + hashing; Windows/MinGW RNG overhead in the paper's run vs Linux getrandom() here. Same liboqs 0.15.0 generic build — decap (no fresh randomness) matches the paper." },
-  { id: "kyber-encap", table: "IV", metric: "ML-KEM-512 encap (ms)", paper: 0.094, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the controlled measurement." },
+  { id: "kyber-encap", table: "V", metric: "ML-KEM-512 encap (ms)", paper: 0.018, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-KEM-512"]?.encap), measuredLabel: "[M]",
-    cause: "Same cause as keygen (encapsulation draws fresh randomness)." },
-  { id: "kyber-decap", table: "IV", metric: "ML-KEM-512 decap (ms)", paper: 0.024, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the controlled measurement." },
+  { id: "kyber-decap", table: "V", metric: "ML-KEM-512 decap (ms)", paper: 0.022, paperLabel: "[M]", unit: "ms",
     measured: () => hv(pqc?.algorithms?.["ML-KEM-512"]?.decap), measuredLabel: "[M]",
-    cause: "No randomness consumed — matches the paper." },
-  // ----- Table V
-  { id: "constraints", table: "V", metric: "R1CS constraints", paper: 21434, paperLabel: "[M]", unit: "",
+    cause: "V6.6 reports the controlled measurement." },
+  // ----- Table VI (Groth16) — V6.6 circuit v2 + controlled campaign
+  { id: "constraints", table: "VI", metric: "R1CS constraints", paper: 21715, paperLabel: "[M]", unit: "",
     measured: () => circuitInfo?.nConstraints, measuredLabel: "[M]",
-    cause: "Protocol revision, not drift: circuit v2 adds verifier-domain separation (stmtCode = Poseidon(STMT_V1, domainTag), V6 §F3) and a second policy predicate (AGE_LT), +~556 constraints over the v1 reproduction (21,159)." },
-  { id: "private-inputs", table: "V", metric: "private inputs", paper: 41, paperLabel: "[M]", unit: "",
+    cause: "V6.6 reports the measured circuit-v2 count (21,715)." },
+  { id: "private-inputs", table: "VI", metric: "private inputs", paper: 43, paperLabel: "[M]", unit: "",
     measured: () => circuitInfo?.nPrvInputs, measuredLabel: "[M]",
-    cause: "v2 adds predicateCode and domainTag to the witness (41 → 43). Public signals remain 5." },
-  { id: "witness-gen", table: "V", metric: "witness generation (ms)", paper: 356, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports the measured circuit-v2 witness size (43)." },
+  { id: "witness-gen", table: "VI", metric: "witness generation (ms)", paper: 92, paperLabel: "[M]", unit: "ms",
     measured: () => hv(zk?.witnessGeneration), measuredLabel: "[M]",
-    cause: "Large (~4×) and not fully attributable: same snarkJS 0.7.4 WASM calculator and Node 22.16.0; the paper's witness figure (σ=186 on mean 356 — high variance) was very likely measured under concurrent load, as its σ suggests. The controlled number here is stable across 3 independent runs (CV recorded). The paper value should be replaced by the controlled measurement." },
-  { id: "snarkjs-prove", table: "V", metric: "snarkJS prove (ms, median basis)", paper: 876, paperLabel: "[M] median", unit: "ms",
+    cause: "V6.6 reports the controlled measurement (92 ms, inter-run CV 0.5%)." },
+  { id: "snarkjs-prove", table: "VI", metric: "snarkJS prove (ms, sustained mean)", paper: 2095, paperLabel: "[M]", unit: "ms",
     measured: () => hv(zk?.snarkjsProveCold), measuredLabel: "[M]",
-    cause: "snarkJS proving has σ/mean > 0.2 (JS JIT warmup + GC tails), so the median is the headline (§B6). Compared against the paper's median 876 ms." },
-  { id: "rapidsnark-prove", table: "V", metric: "rapidsnark prove, cold (ms, campaign/sustained)", paper: 156.28, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports ≈981 ms cool / ≈2.1 s sustained (campaign mean 2095 ms, CV 21%); this row compares the sustained-mean headline." },
+  { id: "rapidsnark-prove", table: "VI", metric: "rapidsnark prove, cold (ms, campaign/sustained)", paper: 258.6, paperLabel: "[M]", unit: "ms",
     measured: () => hv(zk?.rapidsnarkProveCold), measuredLabel: "[M]",
-    cause: "Fully characterized by the §C re-measurement: the V5 figure (274.59 ms) was a contended-run artifact; under §B controls the residual variable is THERMAL STATE of this 15 W ULV part — truly-cool first run 177 ms (zk_rapidsnark_cool.json run 1), self-heated steady state ≈228 ms, heat-soaked campaign ordering ≈250–286 ms. Even the best cool-state run stays +13% above the paper's 156.28 ms, so per §C4 the paper takes the measured values with the thermal-state annotation (cool 177 / sustained ≈233). The sub-second core claim is unaffected." },
-  { id: "rapidsnark-prove-cool", table: "V", metric: "rapidsnark prove, cold (ms, truly-cool first run)", paper: 156.28, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports ≈250–286 ms heat-soaked (mean 258.6 ms) for the sustained ordering." },
+  { id: "rapidsnark-prove-cool", table: "VI", metric: "rapidsnark prove, cold (ms, truly-cool first run)", paper: 177, paperLabel: "[M]", unit: "ms",
     measured: () => zkCool?.cold?.perRun?.[0]?.medianMs, measuredLabel: "[M]",
-    cause: "Best-case controlled measurement (first run after >=10 min idle on the quiesced machine); the realistic single-authentication state. Still +13% over the paper — the paper's number likely reflects a colder package/full turbo burst in the original campaign and should be updated." },
-  { id: "verify", table: "V", metric: "Groth16 verify (ms)", paper: 41, paperLabel: "[M]", unit: "ms",
+    cause: "V6.6 reports ≈177 ms in the truly-cool single-authentication state." },
+  { id: "verify", table: "VI", metric: "Groth16 verify (ms)", paper: 40, paperLabel: "[M]", unit: "ms",
     measured: () => hv(zk?.snarkjsVerify), measuredLabel: "[M]",
-    cause: "Constant-size pairing check; matches the paper." },
-  { id: "speedup", table: "V", metric: "speedup snarkJS/rapidsnark (cold/cold)", paper: 6.9, paperLabel: "[M]", unit: "×",
+    cause: "V6.6 reports the controlled measurement (40 ms, inter-run CV 0.6%)." },
+  { id: "speedup", table: "VI", metric: "speedup snarkJS/rapidsnark (sustained/sustained)", paper: 8.1, paperLabel: "[M]", unit: "×",
     measured: () => zk?.speedups?.coldCold, measuredLabel: "[M]",
-    cause: "Recomputed from the controlled cold/cold headline values (§C3 identical bases)." },
-  { id: "proof-size", table: "V", metric: "proof size, snarkJS JSON (B)", paper: 723, paperLabel: "[M]", unit: "B",
+    cause: "V6.6 headlines ≈5.5× (cool/cool) with a ≈5.5–8× spread across thermal states; this row compares the sustained/sustained basis (≈8×)." },
+  { id: "proof-size", table: "VI", metric: "proof size, snarkJS JSON (B)", paper: 723, paperLabel: "[M]", unit: "B",
     measured: () => zk?.proofSize?.snarkjsJsonBytes, measuredLabel: "[M]",
-    cause: "Decimal-length variance in the JSON serialization of BN254 field elements (the paper's own 721 vs 723 delta has the same cause); ≈128 B compressed." },
-  // ----- gas + baseline + §VI-C
-  { id: "gas", table: "V/VI", metric: "on-chain verify gas (bare tx)", paper: 250000, paperLabel: "[A] ~2–3×10⁵", unit: "gas",
+    cause: "V6.6 reports 723 B (snarkJS JSON serialization); ≈128 B compressed." },
+  // ----- gas + baseline + §VI-C — V6.6 measured upgrades
+  { id: "gas", table: "VI", metric: "on-chain verify gas (bare tx)", paper: 242931, paperLabel: "[M]", unit: "gas",
     measured: () => gas?.verifyProofDirectTxGasUsed, measuredLabel: "[M]",
-    cause: "[A]→[M] upgrade: measured on a local Anvil EVM with a real proof (paper midpoint 2.5×10⁵ used for the delta)." },
-  { id: "ecdsa-sign", table: "IV/VI", metric: "ECDSA P-256 sign (ms)", paper: 0.2, paperLabel: "[A] reference", unit: "ms",
+    cause: "V6.6 reports the measured bare verifyProof gas on a local single-node EVM (242,931)." },
+  { id: "ecdsa-sign", table: "V/VII", metric: "ECDSA P-256 sign (ms)", paper: 0.026, paperLabel: "[M]", unit: "ms",
     measured: () => hv(baseline?.ecdsaP256?.sign), measuredLabel: "[M]",
-    cause: "[A]→[M] upgrade: the paper used dated reference values; modern OpenSSL on this CPU is faster. The ZKP-overhead ratio in Table VI is recomputed from measured values (and grows)." },
-  { id: "ecdsa-verify", table: "IV/VI", metric: "ECDSA P-256 verify (ms)", paper: 0.3, paperLabel: "[A] reference", unit: "ms",
+    cause: "V6.6 measures ECDSA P-256 on the same host with OpenSSL." },
+  { id: "ecdsa-verify", table: "V/VII", metric: "ECDSA P-256 verify (ms)", paper: 0.062, paperLabel: "[M]", unit: "ms",
     measured: () => hv(baseline?.ecdsaP256?.verify), measuredLabel: "[M]",
-    cause: "Same as ECDSA sign." },
-  { id: "vic-core", table: "§VI-C", metric: "core auth latency, native prover (ms)", paper: 553, paperLabel: "[S] stitched", unit: "ms",
+    cause: "V6.6 measures ECDSA P-256 on the same host with OpenSSL." },
+  { id: "vic-core", table: "§VI-C", metric: "core auth latency, native prover (ms)", paper: 390, paperLabel: "[M]", unit: "ms",
     measured: () => latency?.totals?.coreRapidsnarkMs, measuredLabel: "[M]",
-    cause: "§VI-C must be updated to the measured breakdown (results/e2e_latency.json) and the sub-second claim explicitly scoped to the rapidsnark path; the snarkJS-path core is not sub-second." },
+    cause: "V6.6 reports the measured core breakdown: ≈0.31 s cool / ≈0.39 s sustained (92 + 177/258.6 + 40 ms)." },
 ];
 
 interface DivRow extends ClaimSpec {
@@ -172,7 +177,7 @@ function main(): void {
   const host = zk?.controls?.host ?? pqc?.controls?.host ?? {};
   const wsl = zk?.controls?.wsl ?? pqc?.controls?.wsl ?? {};
 
-  w("# RESULTS — Measured Evidence for IEEE Access-2026-15409 (V6 controlled campaign)");
+  w("# RESULTS — Measured Evidence for IEEE Access-2026-15409 (controlled campaign; reconciled to submitted manuscript V6.6)");
   w();
   w("> Generated by `harness/generate_results.ts` from `results/*.json`. **Do not edit by hand.**");
   w("> Labels: `[M]` measured, `[S]` simulated/estimate, `[A]` assumption, `[F]` future work.");
@@ -194,8 +199,8 @@ function main(): void {
   for (const line of controlsBlock(zk?.controls)) w(line);
   w();
 
-  // ---------------- Table IV ----------------
-  w("## Table IV — PQC primitives (liboqs 0.15.0, generic AVX2-off build)");
+  // ---------------- Table V (PQC) ----------------
+  w("## Table V — PQC primitives (liboqs 0.15.0, generic AVX2-off build)");
   w();
   if (!pqc) w("_Run `make bench` first._");
   else {
@@ -207,12 +212,12 @@ function main(): void {
     w("|---|---|---|---|---|---|---|");
     const row = (alg: string, op: string, o: any, paper: number): void =>
       w(`| ${alg} | ${op} | ${hv(o)} | ${sd(o)} | ${cv(o)} | ${paper} | [M] |`);
-    row("ML-DSA-44", "keygen", d.keygen, 0.124);
-    row("ML-DSA-44", "sign", d.sign, 0.287);
-    row("ML-DSA-44", "verify", d.verify, 0.06);
-    row("ML-KEM-512", "keygen", k.keygen, 0.091);
-    row("ML-KEM-512", "encap", k.encap, 0.094);
-    row("ML-KEM-512", "decap", k.decap, 0.024);
+    row("ML-DSA-44", "keygen", d.keygen, 0.052);
+    row("ML-DSA-44", "sign", d.sign, 0.188);
+    row("ML-DSA-44", "verify", d.verify, 0.058);
+    row("ML-KEM-512", "keygen", k.keygen, 0.016);
+    row("ML-KEM-512", "encap", k.encap, 0.018);
+    row("ML-KEM-512", "decap", k.decap, 0.022);
     w();
     w(`Sizes match FIPS 203/204 exactly (pk 1312/800, sk 2560/1632, sig 2420, ct 768, ss 32).`);
     if (pqcAvx2) {
@@ -224,31 +229,31 @@ function main(): void {
   }
   w();
 
-  // ---------------- Table V ----------------
-  w("## Table V — Groth16 (BN254), circuit v2, byte-identical prover inputs");
+  // ---------------- Table VI (Groth16) ----------------
+  w("## Table VI — Groth16 (BN254), circuit v2, byte-identical prover inputs");
   w();
   if (!zk) w("_Run `make bench` first._");
   else {
     const cc = zk.config.circuit;
-    w(`Circuit: **${cc.nConstraints} constraints**, ${cc.nWires} wires, ${cc.nPubInputs} public / ${cc.nPrvInputs} private (${cc.version}; paper: 21,434/21,472/5/41 — see divergence table).`);
+    w(`Circuit: **${cc.nConstraints} constraints**, ${cc.nWires} wires, ${cc.nPubInputs} public / ${cc.nPrvInputs} private (${cc.version}; V6.6: 21,715/21,745/5/43 — agrees).`);
     w(`zkey SHA-256 \`${String(zk.config.zkeySha256).slice(0, 16)}…\`, witness SHA-256 \`${String(zk.config.witnessSha256).slice(0, 16)}…\` — identical for both provers.`);
     w();
     w("| Metric | Headline | basis | inter-run medians (ms) | CV | Paper | Status |");
     w("|---|---|---|---|---|---|---|");
     const row = (name: string, p: any, paper: string): void =>
       w(`| ${name} | ${p.headline.valueMs} ms | ${p.headline.basis} | ${p.interRun.mediansMs.join(" / ")} | ${p.interRun.cvPct}%${p.interRun.stable ? "" : " ⚠"} | ${paper} | [M] |`);
-    row("Witness generation (snarkJS WASM)", zk.witnessGeneration, "356 (σ186)");
-    row("snarkJS prove — cold (file-based, paper basis)", zk.snarkjsProveCold, "1083 mean / 876 median");
+    row("Witness generation (snarkJS WASM)", zk.witnessGeneration, "92 (CV 0.5%)");
+    row("snarkJS prove — cold (file-based, paper basis)", zk.snarkjsProveCold, "981 cool / 2095 sustained");
     row("snarkJS prove — amortized (in-memory buffers)", zk.snarkjsProveAmortized, "—");
-    row("rapidsnark prove — cold (subprocess wall, ext4; paper basis; heat-soaked ordering)", zk.rapidsnarkProveCold, "156.28 mean / 153.51 median");
+    row("rapidsnark prove — cold (subprocess wall, ext4; paper basis; heat-soaked ordering)", zk.rapidsnarkProveCold, "177 cool / 258.6 sustained");
     row("rapidsnark prove — amortized (zkey parsed once)", zk.rapidsnarkProveAmortized, "—");
     if (zkCool) {
-      row("rapidsnark prove — cold, COOL-STATE re-run (§C1, after ≥10 min idle)", zkCool.cold, "156.28 mean / 153.51 median");
+      row("rapidsnark prove — cold, COOL-STATE re-run (§C1, after ≥10 min idle)", zkCool.cold, "177 cool");
       row("rapidsnark prove — amortized, cool-state", zkCool.amortized, "—");
     }
-    row("Groth16 verify (snarkJS)", zk.snarkjsVerify, "41 (σ3.1)");
+    row("Groth16 verify (snarkJS)", zk.snarkjsVerify, "40 (CV 0.6%)");
     w();
-    w(`**Speedups (identical bases, §C3):** cold/cold **${zk.speedups.coldCold}×** (paper 6.9×); amortized/amortized **${zk.speedups.amortizedAmortized}×**.`);
+    w(`**Speedups (identical bases, §C3):** cold/cold **${zk.speedups.coldCold}×** (V6.6: ≈5.5× cool/cool, ≈5.5–8× across thermal states); amortized/amortized **${zk.speedups.amortizedAmortized}×**.`);
     w();
     w(`Proof: ${zk.proofSize.snarkjsJsonBytes} B snarkJS / ${zk.proofSize.rapidsnarkJsonBytes} B rapidsnark JSON (≈128 B compressed); ${zk.proofSize.publicSignals} public signals. Cross-prover verification: rapidsnark cold ${zk.correctness.rapidsnarkColdVerifies}, amortized ${zk.correctness.rapidsnarkAmortizedVerifies} under snarkJS.`);
     w();
@@ -264,7 +269,7 @@ function main(): void {
       w(`| self-heated steady state | ≈${zkCool.cold.perRun?.[1]?.medianMs ?? "—"} ms | ≈2095 ms | cool-bench runs 2–3; campaign snarkJS runs 2–3 |`);
     }
     w(`| heat-soaked (campaign ordering) | ${hv(zk.rapidsnarkProveCold)} ms | ${hv(zk.snarkjsProveCold)} ms | \`zk.json\` (rapidsnark measured after ~50 min of snarkJS) |`);
-    w(`| paper's campaign | 156.28 ms | 1083/876 ms | original measurement |`);
+    w(`| V6.6 manuscript (cool / sustained) | 177 / 258.6 ms | 981 / 2095 ms | matches the measured campaign |`);
     w();
     w("The snarkJS cold CV (⚠ flag above) is this bimodality, not scheduler noise. For a single");
     w("authentication (the protocol's real workload — one proof, not 100 back-to-back) the");
@@ -278,12 +283,12 @@ function main(): void {
   w("## On-chain verification gas ([A] → [M])");
   w();
   if (gas) {
-    w(`\`verifyProof\` bare tx **${gas.verifyProofDirectTxGasUsed} gas**; via contract + SSTORE ${gas.probeTxGasUsed} gas; calldata ${gas.calldataBytes} B; valid proof accepted ${gas.staticCallValid}, corrupted signal rejected ${gas.corruptedSignalRejected}. Paper: ~2–3×10⁵ [A]; public testnet remains [F]. Source: \`results/gas.json\`.`);
+    w(`\`verifyProof\` bare tx **${gas.verifyProofDirectTxGasUsed} gas**; via contract + SSTORE ${gas.probeTxGasUsed} gas; calldata ${gas.calldataBytes} B; valid proof accepted ${gas.staticCallValid}, corrupted signal rejected ${gas.corruptedSignalRejected}. V6.6: 242,931 gas [M] (local single-node EVM); public testnet remains [F]. Source: \`results/gas.json\`.`);
   } else w("_Run `npm run gas`._");
   w();
 
-  // ---------------- Table VI ----------------
-  w("## Table VI — vs centralized classical baseline (measured)");
+  // ---------------- Table VII (baseline) ----------------
+  w("## Table VII — vs centralized classical baseline (measured)");
   w();
   if (baseline && zk) {
     const e = baseline.ecdsaP256;
@@ -311,7 +316,7 @@ function main(): void {
     w(`| native (rapidsnark, cold) | **${t.coreRapidsnarkMs} ms** | ${t.e2eRapidsnarkMs.min}–${t.e2eRapidsnarkMs.max} ms | **${t.subSecondCoreRapidsnark}** |`);
     w(`| snarkJS | ${t.coreSnarkjsMs} ms | ${t.e2eSnarkjsMs.min}–${t.e2eSnarkjsMs.max} ms | ${t.subSecondCoreSnarkjs} |`);
     w();
-    w(`Paper §VI-C claimed ~553 ms core / 600–900 ms e2e [S]. ${t.qualifier}. Source: \`results/e2e_latency.json\` (each component labeled).`);
+    w(`V6.6 §VI-C reports the measured core breakdown (≈0.31 s cool / ≈0.39 s sustained, native path) and an ≈0.34–0.51 s e2e total [S]. ${t.qualifier}. Source: \`results/e2e_latency.json\` (each component labeled).`);
   } else w("_Run `npm run e2e:latency`._");
   w();
 
@@ -330,10 +335,15 @@ function main(): void {
   const rows = divergences();
   w(`## Complete divergence table (auto-generated, threshold ${THRESHOLD_PCT}%)`);
   w();
-  w("Programmatic diff of every measured cell against the embedded paper claims (§D). The list is");
-  w("automatic and complete; cause texts are curated. Full reconciliation actions per row live in");
-  w("`MANUSCRIPT_RECONCILIATION.md` (mirrored automatically).");
+  w("Programmatic diff of every measured cell against the embedded paper claims (§D), versioned to");
+  w("the submitted manuscript (V6.6). The list is automatic and complete; cause texts are curated.");
+  w("Full reconciliation actions per row live in `MANUSCRIPT_RECONCILIATION.md` (mirrored automatically).");
   w();
+  if (rows.length === 0) {
+    w("**No divergences.** Every measured cell agrees with the submitted manuscript (V6.6) within the");
+    w(`${THRESHOLD_PCT}% threshold — the manuscript adopted the prototype's controlled measurements.`);
+    w();
+  }
   for (const line of divergenceTable(rows)) w(line);
   w();
   w("Metrics measured within the threshold (no divergence): " +
@@ -357,10 +367,20 @@ function main(): void {
   const R: string[] = [BEGIN, ""];
   R.push(`## Complete divergence table (auto-generated, threshold ${THRESHOLD_PCT}%)`);
   R.push("");
+  R.push("Diff of every measured cell against the **submitted manuscript (V6.6)**.");
+  R.push("");
+  if (rows.length === 0) {
+    R.push("**No divergences.** Every measured cell agrees with the submitted manuscript (V6.6)");
+    R.push(`within the ${THRESHOLD_PCT}% threshold; the items above were incorporated into V6.6, so the`);
+    R.push("manuscript and the prototype now report the same numbers. (Earlier revisions showed");
+    R.push("divergences here; those edits are now reflected in the submitted text.)");
+    R.push("");
+  }
   for (const line of divergenceTable(rows)) R.push(line);
   R.push("");
   R.push("### Reconciliation actions, one per divergent cell");
   R.push("");
+  if (rows.length === 0) R.push("_None — all cells agree with V6.6._");
   rows.forEach((r, i) => {
     R.push(`${i + 1}. **${r.metric}** (Table ${r.table}) — paper ${r.paper}${r.unit} ${r.paperLabel} → measured **${r.measuredValue}${r.unit}** ${r.measuredLabel} (${r.deltaPct > 0 ? "+" : ""}${r.deltaPct}%, ${r.direction}).`);
     R.push(`   ${r.cause}`);

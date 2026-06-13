@@ -2,9 +2,13 @@
 
 An honest accounting of (A) artifacts the manuscript references that are **not
 present** in the prototype repository, and (B) **documentation discrepancies**
-found during the release review. Per the integrity rules for this archival
-release, reported values and source code were left **unaltered**; the items
-below are surfaced for the author to reconcile rather than silently changed.
+found during the release review. The functional source code (TypeScript, Python,
+Circom, Solidity) and the measured `results/*.json` remain **unaltered and
+byte-identical** to the original prototype. The documentation-only discrepancies
+B1–B3 have since been **fixed** in this public repo, and the manuscript
+reconciliation has been **brought current to the submitted revision (V6.6)** —
+see Section C. Items that remain are author-side (manuscript edits) and are
+surfaced for the author rather than changed here.
 
 ---
 
@@ -25,34 +29,52 @@ below are surfaced for the author to reconcile rather than silently changed.
 
 ---
 
-## B. Documentation discrepancies found (left unaltered)
+## B. Documentation discrepancies found (B1–B3 now FIXED)
 
-| # | Where | Discrepancy | Impact |
+The discrepancies below were found in the first release pass. B1–B3 are now
+**resolved** in the public repo (they are documentation-only and touch no
+measured value, algorithm, circuit, contract, or test). B4 is provenance and is
+intentionally left verbatim.
+
+| # | Where | Discrepancy | Status |
 |---|---|---|---|
-| B1 | `REPRODUCE.md`, "Pinning and verifying" section | Cites committed zkey SHA-256 `2f9216e3…` and "paper's zkey was `22e69c5b…`". The **actual** committed `setup/out/credential_auth_final.zkey`, `setup/pins.json`, `results/zk.json`, `RESULTS.md`, and **manuscript Appendix A.1** all use `63529c2b8a3320ce…` (independently re-verified against the on-disk file). | **Cosmetic / stale strings.** The pinned artifact and the determinism test are self-consistent at `63529c2b…`; only that one prose section is stale. Left unaltered to avoid editing a "reported value"; recommended fix: update the two hashes in that section to `63529c2b…` (and drop the `22e69c5b…` reference, which the manuscript no longer uses). |
-| B2 | `REPRODUCE.md` (§A.4 / Pinning section) references `npm run verify-pins` | No `verify-pins` script exists in `package.json` (only a `verify-pins` **Make** target exists, `Makefile` lines 77–78, which runs `setup/download_ptau.ts`). | **Minor.** `make verify-pins` works; `npm run verify-pins` errors. Recommended fix: add a `"verify-pins"` npm script mirroring the Make target, **or** change the doc to `make verify-pins`. Not changed here because adding an npm script alters the command surface. |
-| B3 | `fixtures/vc-schema.json` → `encoding` field | Describes `policyHash` as `Poseidon(1, threshold) — 1 = POLICY_V1_AGE_GTE` and `stmtCode: 1 = STMT_V1`, which predates the V6 generalized policy predicate (`predicateCode ∈ {1,2}`) and the domain-separated `stmtCode = Poseidon(STMT_V1, domainTag)`. | **Inert.** It is a human-readable documentation field inside a fixture, not consumed by any code path; the actual circuit/encoding logic (`circuits/credential_auth.circom`, `packages/common/src/encoding.ts`) is correct and V6-current. Recommended fix: refresh the comment text. |
-| B4 | `circuits/build/circuit_info.json` → `circomStdout` | Embeds an absolute Windows build path (`C:\Users\kusha\…`). | **Provenance, not a bug.** It is a captured build log faithfully recording where/when the artifact was produced; it is not a path the code resolves. Left verbatim as measurement provenance. |
+| B1 | `REPRODUCE.md`, "Pinning and verifying" section | Cited committed zkey SHA-256 `2f9216e3…` and "paper's zkey was `22e69c5b…`". The **actual** committed `setup/out/credential_auth_final.zkey`, `setup/pins.json`, `results/zk.json`, `RESULTS.md`, and **manuscript Appendix A.1 (V6.6)** all use `63529c2b8a3320ce…`. | **FIXED.** The section now states the zkey hash as `63529c2b…`, notes the agreement with V6.6 Appendix A.1 and `results/zk.json`, and points to `npm run verify-pins` / `sha256sum`. The `22e69c5b…` reference was removed. |
+| B2 | `REPRODUCE.md` referenced `npm run verify-pins` | No `verify-pins` npm script existed (only a `verify-pins` Make target). | **FIXED.** A `"verify-pins": "tsx setup/download_ptau.ts"` script was added to `package.json`, mirroring the Make target; `npm run verify-pins` now works as documented. |
+| B3 | `fixtures/vc-schema.json` → `encoding` field | Described `policyHash` as `Poseidon(1, threshold)` and `stmtCode: 1 = STMT_V1`, predating the V6 generalized predicate and domain-separated `stmtCode`. | **FIXED.** The `encoding` comment now reads `policyHash = Poseidon(predicateCode, threshold)` (`1 = AGE_GTE, 2 = AGE_LT`) and `stmtCode = Poseidon(STMT_V1, domainTag)`. (This is a human-readable doc field; the on-chain schema hash it produces is not asserted by any test or committed result, so the change is functionally inert.) |
+| B4 | `circuits/build/circuit_info.json` → `circomStdout` | Embeds an absolute Windows build path (`C:\Users\kusha\…`). | **Left verbatim (provenance, not a bug).** A captured build log recording where/when the artifact was produced; not a path the code resolves. |
 
-> B1–B4 are **documentation-level** and do not affect any executable behaviour,
-> measurement, test result, circuit, contract, or cryptographic operation. They
-> are reported here (rather than edited) to keep the release scientifically and
-> functionally identical to the prototype that produced the paper's evaluation.
+> The B1–B3 fixes are **documentation-level** and do not affect any executable
+> behaviour, measurement, test result, circuit, contract, or cryptographic
+> operation. The 141 functional source files (TypeScript, Python, Circom,
+> Solidity) remain byte-identical to the original prototype; the only changed
+> files are documentation, the release `.gitignore`, the paper-claim reference
+> constants in `harness/generate_results.ts` (versioned to V6.6 — see below),
+> the regenerated `RESULTS.md`/`MANUSCRIPT_RECONCILIATION.md`, the added
+> `verify-pins` script, and the `vc-schema.json` comment.
 
 ---
 
-## C. Recommended manuscript/repo reconciliations (for the author)
+## C. Reconciliation status
 
-1. Replace the `(LINK OVER HERE)` placeholder in §VI with
-   `https://github.com/Kushal-Sachdeva78/pq-identity-prototype` (v1.0) — **A3**.
-2. (Optional) Add the Figure 1/Figure 2 diagram sources to the repository (e.g.
-   under a `figures/` directory) so the rendered figures are reproducible, not
-   only their executable equivalent — **A1, A2**.
-3. Correct the stale zkey hashes in `REPRODUCE.md`'s pinning section to
-   `63529c2b…` — **B1**.
-4. Reconcile `npm run verify-pins` vs the Make target — **B2**.
-5. Refresh the `encoding` comment in `fixtures/vc-schema.json` to the V6
-   predicate/stmtCode wording — **B3**.
+**Done in the public repo:**
 
-None of these are required to reproduce the paper's measured results; they are
-polish for the public release and manuscript camera-ready.
+- **B1** — `REPRODUCE.md` zkey hashes corrected to `63529c2b…`; `22e69c5b…` removed.
+- **B2** — `verify-pins` npm script added.
+- **B3** — `fixtures/vc-schema.json` `encoding` comment refreshed to V6 wording.
+- **Manuscript reconciliation brought current to V6.6** — the paper-claim
+  reference values in `harness/generate_results.ts` were versioned to the
+  submitted manuscript (V6.6), `RESULTS.md` and `MANUSCRIPT_RECONCILIATION.md`
+  were regenerated, and the auto-divergence table now collapses to **0 rows**
+  (the paper and the prototype report the same numbers). The reconciliation prose
+  is relabelled "incorporated in V6.6".
+
+**Still author-side (cannot be done from this repo):**
+
+- **A3** — replace the `(LINK OVER HERE)` placeholder in §VI of the manuscript
+  with `https://github.com/Kushal-Sachdeva78/pq-identity-prototype`.
+- **A1, A2** *(optional)* — add the Figure 1 / Figure 2 diagram sources (e.g.
+  under a `figures/` directory) so the rendered figures are reproducible, not
+  only their executable equivalent.
+
+None of the author-side items are required to reproduce the paper's measured
+results; they are camera-ready polish.

@@ -183,12 +183,14 @@ re-pinned and the change is visible in git.
 
 The committed `setup/pins.json` in this repo:
 - `powersOfTau28_hez_final_15.ptau` — `3ef2ecc5b75d687048cf2d59195119b42fb07c5af639c5f283d84bfa69829e7f`
-- `credential_auth_final.zkey` — `2f9216e34cd5aebf05cd0d1c42ce09021605100c9261d3387e15f2475cce1c1f`
+- `credential_auth_final.zkey` — `63529c2b8a3320ce352401b3bf89fa0cde4ff3d0c5354e6d5b6f28c83f9101cc`
 
-The paper's Appendix A.1 reports a different zkey hash (`22e69c5b…`); that is expected — it was
-produced from a different circuit build/ceremony. The integrity guarantee here is that *both*
-provers consume the *same* zkey+witness (asserted by SHA-256 equality in `proveBoth`/`bench:zk`),
-which is what makes the snarkJS↔rapidsnark speedup a like-for-like comparison.
+This is the same proving-key hash reported in the submitted manuscript's Appendix A.1 (V6.6) and
+embedded in `results/zk.json` — the committed artifact, the pin, and the paper agree, and you can
+verify it yourself with `npm run verify-pins` or `sha256sum setup/out/credential_auth_final.zkey`.
+The integrity guarantee is that *both* provers consume the *same* zkey+witness (asserted by SHA-256
+equality in `proveBoth`/`bench:zk`), which is what makes the snarkJS↔rapidsnark speedup a
+like-for-like comparison.
 
 ---
 

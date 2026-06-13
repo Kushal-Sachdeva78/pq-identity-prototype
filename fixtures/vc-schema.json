@@ -32,7 +32,7 @@
     "canonicalJson": "recursively key-sorted JSON, no whitespace, UTF-8",
     "claims.age": "uint32, range-checked in-circuit (Num2Bits(32))",
     "holderCommit": "Poseidon(holderSecret) as a decimal BN254 field element",
-    "policyHash": "Poseidon(1, threshold) — 1 = POLICY_V1_AGE_GTE",
-    "stmtCode": "1 = STMT_V1: possession ∧ policy ∧ issuer-bound ∧ not-revoked"
+    "policyHash": "Poseidon(predicateCode, threshold) — predicateCode 1 = AGE_GTE, 2 = AGE_LT",
+    "stmtCode": "Poseidon(STMT_V1, domainTag) — STMT_V1 = 1; domainTag binds the requesting verifier (verifier-domain separation)"
   }
 }

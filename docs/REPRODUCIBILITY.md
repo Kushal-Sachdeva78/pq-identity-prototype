@@ -46,13 +46,19 @@ reproducible from this repository (and why) is in
 [`VALIDATION_REPORT.md`](VALIDATION_REPORT.md) and
 [`MISSING_ARTIFACTS.md`](MISSING_ARTIFACTS.md).
 
-## Known pin-documentation note
+## Pin verification
 
-The committed `setup/pins.json`, `results/zk.json`, `RESULTS.md`, and the
-manuscript Appendix A.1 all agree the committed proving key has SHA-256
-`63529c2b8a3320ce…` (verified against the on-disk `setup/out/credential_auth_final.zkey`).
-The "Pinning and verifying" prose in [`../REPRODUCE.md`](../REPRODUCE.md) cites
-an older `2f9216e3…` value and refers to the paper's earlier `22e69c5b…` build;
-these are stale strings in that one section and do not affect the pinned
-artifact or the determinism check. This is recorded (and left unaltered, to
-avoid editing reported values) in [`VALIDATION_REPORT.md`](VALIDATION_REPORT.md).
+The committed `setup/pins.json`, `results/zk.json`, `RESULTS.md`,
+[`../REPRODUCE.md`](../REPRODUCE.md), and the manuscript Appendix A.1 (V6.6) all
+agree the committed proving key has SHA-256 `63529c2b8a3320ce…`. Verify it
+yourself:
+
+```bash
+npm run verify-pins                                   # re-checks the ptau pin
+sha256sum setup/out/credential_auth_final.zkey        # -> 63529c2b8a3320ce…
+sha256sum setup/ptau/powersOfTau28_hez_final_15.ptau  # -> 3ef2ecc5b75d6870…
+```
+
+(An earlier release pass found a stale `2f9216e3…`/`22e69c5b…` string in
+`REPRODUCE.md`; it has been corrected to `63529c2b…` — see
+[`MISSING_ARTIFACTS.md`](MISSING_ARTIFACTS.md) B1.)

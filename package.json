@@ -30,7 +30,8 @@
     "audit": "tsx harness/circomspect_audit.ts",
     "campaign": "tsx harness/campaign.ts",
     "tables": "tsx harness/generate_results.ts",
-    "demo": "tsx cli/demo.ts"
+    "demo": "tsx cli/demo.ts",
+    "verify-pins": "tsx setup/download_ptau.ts"
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",
